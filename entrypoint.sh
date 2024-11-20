@@ -143,7 +143,6 @@ function generate_certs() {
         echo -e "\n" >> ${PGPOOL_INSTALL_DIR}/etc/pgpool.conf
         echo "ssl = 'on'" >> ${PGPOOL_INSTALL_DIR}/etc/pgpool.conf
     else
-
         grep -E "^ssl\s*=" ${PGPOOL_INSTALL_DIR}/etc/pgpool.conf | tail -1 | grep -E "^ssl\s*=\s*'?on'?" > /dev/null
 
         if [[ $? -ne 0 ]]; then

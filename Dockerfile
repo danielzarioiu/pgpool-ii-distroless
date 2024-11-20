@@ -11,7 +11,7 @@ ADD https://pgpool.net/mediawiki/images/pgpool-II-${PGPOOL_VER}.tar.gz /tmp
 RUN mkdir /tmp/pgpool \
     && tar -zxf /tmp/pgpool-II-${PGPOOL_VER}.tar.gz -C /tmp/pgpool --strip-components 1 \
     && cd /tmp/pgpool \
-    && ./configure --prefix=${INSTALL_DIR} \
+    && ./configure --prefix=${INSTALL_DIR} --with-openssl \
     && mkdir -p ${INSTALL_DIR}/tls \
     && make -j $(nproc) \
     && make install
