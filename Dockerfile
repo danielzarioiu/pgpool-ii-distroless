@@ -5,17 +5,18 @@ ARG PGPOOL_VER=4.5.4
 ARG INSTALL_DIR=/opt/pgpool-II
 
 RUN apt update && apt install -y \
-    libtool libpq-dev libpq5 libssl3 libssl-dev libgssapi-krb5-2 libkrb5-3 libldap-2.5-0 libkrb5support0 libkrb5-3 libsasl2-2 libk5crypto3 libkeyutils1 libgssapi-krb5-2 make 
+    libtool libpq-dev libpq5 libssl3 libssl-dev libgssapi-krb5-2 libkrb5-3 libldap-2.5-0 libkrb5support0 libkrb5-3 libsasl2-2 libk5crypto3 libkeyutils1 libgssapi-krb5-2 openssl make 
 
 ADD https://pgpool.net/mediawiki/images/pgpool-II-${PGPOOL_VER}.tar.gz /tmp
 RUN mkdir /tmp/pgpool \
     && tar -zxf /tmp/pgpool-II-${PGPOOL_VER}.tar.gz -C /tmp/pgpool --strip-components 1 \
     && cd /tmp/pgpool \
     && ./configure --prefix=${INSTALL_DIR} \
+    && mkdir -p ${INSTALL_DIR}/tls \
     && make -j $(nproc) \
     && make install
 
-ADD https://raw.githubusercontent.com/pgpool/pgpool2_on_k8s/refs/heads/master/pgpool.docker/entrypoint.sh \
+ADD ./entrypoint.sh \
     https://raw.githubusercontent.com/pgpool/pgpool2_on_k8s/refs/heads/master/pgpool.docker/start.sh \
     ${INSTALL_DIR}/bin/
 
@@ -44,6 +45,8 @@ COPY --from=builder /usr/lib/*-linux-gnu/libpq.so.5* \
     /usr/lib/*-linux-gnu/libsasl2.so.2 \
     /usr/lib/*-linux-gnu/libkeyutils.so.1 \
     /usr/lib/
+COPY --from=builder /usr/bin/openssl /usr/bin/openssl
+COPY --from=builder /etc/ssl/openssl.cnf /usr/lib/ssl/openssl.cnf
 
 RUN chmod +x bin/entrypoint.sh \
     bin/start.sh
